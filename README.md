@@ -1,8 +1,6 @@
 # rm-pokemon
 
-Display the Pokemon codename from your reMarkable's firmware.
-
-Reads the version string directly from `/usr/bin/xochitl` and prints the embedded sprite.
+Display the Pokemon sprite that matches the codename from your reMarkable's firmware.
 
 ## Usage
 
