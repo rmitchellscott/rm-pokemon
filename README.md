@@ -8,7 +8,15 @@ Display the Pokemon sprite that matches the codename from your reMarkable's firm
 ./rm-pokemon
 ```
 
+To use with fastfetch: `rm-pokemon | fastfetch --file-raw -`
+
 ## Install
+
+### Installation via [Vellum package manager](https://github.com/vellum-dev/vellum)
+
+`vellum install rm-pokemon`
+
+### Manual
 
 Download the binary for your device from [releases](https://github.com/rmitchellscott/rm-pokemon/releases):
 - `rm-pokemon-armv7` - reMarkable 1/2
