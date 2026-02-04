@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-unknown-linux-gnu
+            output: rm-pokemon-aarch64
+          - target: armv7-unknown-linux-gnueabihf
+            output: rm-pokemon-armv7
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Rename binary
+        run: cp target/${{ matrix.target }}/release/rm-pokemon ${{ matrix.output }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@git-cliff
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          {
+            echo 'CHANGELOG<<EOF'
+            git cliff --config-url https://gist.githubusercontent.com/rmitchellscott/823c46de7a1c3e6d57e9de90ee00d84a/raw/cliff.toml \
+              --latest --strip header | tail -n +2
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: binaries
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: |
+          cd binaries
+          sha256sum rm-pokemon-* > checksums.txt
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          files: |
+            binaries/rm-pokemon-aarch64
+            binaries/rm-pokemon-armv7
+            binaries/checksums.txt

@@ -1,0 +1,17 @@
+[package]
+name = "rm-pokemon"
+version = "0.1.0"
+edition = "2024"
+description = "Extract Pokemon codename from reMarkable xochitl binary and draw the sprite"
+
+[dependencies]
+memmap2 = "0.9"
+memchr = "2.7"
+rust-embed = "8"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+panic = "abort"
+codegen-units = 1
