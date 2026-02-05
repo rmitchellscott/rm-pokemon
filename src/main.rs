@@ -57,14 +57,20 @@ fn print_sprite(pokemon: &str) -> bool {
 }
 
 fn main() {
-    let arg = std::env::args().nth(1);
-    if arg.as_deref() == Some("--version") || arg.as_deref() == Some("-V") {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+
+    if args.iter().any(|a| a == "--version" || a == "-V") {
         println!("rm-pokemon {VERSION}");
         return;
     }
 
+    let name_only = args.iter().any(|a| a == "--name-only");
     let debug = std::env::var("DEBUG").is_ok();
-    let xochitl_path = arg.as_deref().unwrap_or(DEFAULT_XOCHITL_PATH);
+    let xochitl_path = args
+        .iter()
+        .find(|a| !a.starts_with('-'))
+        .map(|s| s.as_str())
+        .unwrap_or(DEFAULT_XOCHITL_PATH);
 
     let start = Instant::now();
     let pokemon = find_pokemon_name(xochitl_path);
@@ -72,15 +78,19 @@ fn main() {
 
     match pokemon {
         Some(pokemon) => {
-            let start = Instant::now();
-            if !print_sprite(&pokemon) {
-                eprintln!("No sprite found for {pokemon}");
+            if name_only {
                 println!("{pokemon}");
-            }
-            let sprite_time = start.elapsed();
+            } else {
+                let start = Instant::now();
+                if !print_sprite(&pokemon) {
+                    eprintln!("No sprite found for {pokemon}");
+                    println!("{pokemon}");
+                }
+                let sprite_time = start.elapsed();
 
-            if debug {
-                eprintln!("parse: {parse_time:?}, sprite: {sprite_time:?}");
+                if debug {
+                    eprintln!("parse: {parse_time:?}, sprite: {sprite_time:?}");
+                }
             }
         }
         None => eprintln!("No pokemon found in {xochitl_path}"),

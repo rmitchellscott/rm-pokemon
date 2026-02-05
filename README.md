@@ -5,7 +5,9 @@ Display the Pokemon sprite that matches the codename from your reMarkable's firm
 ## Usage
 
 ```bash
-./rm-pokemon
+./rm-pokemon              # Display the Pokemon sprite
+./rm-pokemon --name-only  # Output only the Pokemon name
+./rm-pokemon --version    # Show version
 ```
 
 To use with fastfetch: `rm-pokemon | fastfetch --file-raw -`

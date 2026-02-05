@@ -96,7 +96,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "remarkable-pokemon"
+name = "rm-pokemon"
 version = "0.1.0"
 dependencies = [
  "memchr",
